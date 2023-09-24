@@ -16,6 +16,7 @@ import { OrderProductsCreateDto } from "../dto/order-products-create.dto";
 import { UserContactInfoGetDto } from "../../user/dto/user-contact-info-get.dto";
 import { UserOrderCreatedDto } from "../../user/dto/user-order-created.dto";
 import { OrderDeliveryInfoDto } from "../dto/order-delivery-info.dto";
+import {OrderProductsInOrderDto} from "../dto/order-products-in-order.dto";
 
 @Entity("order", { schema: "computer_shop" })
 export class Order {
@@ -38,13 +39,14 @@ export class Order {
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: User;
 
-  @AutoMap(() => OrderProductsCreateDto)
+  @AutoMap(() => [OrderProductsCreateDto])
+  @AutoMap(() => [OrderProductsInOrderDto])
   @OneToMany(() => OrderProducts, (orderProducts) => orderProducts.order, {
     cascade: ["insert", "update"],
   })
   orderProducts: OrderProducts[];
 
-  @AutoMap(() => OrderDeliveryCreateDto)
+  @AutoMap(() => OrderDeliveryInfoDto)
   @OneToOne(() => OrderDeliveryInfo, (deliveryInfo) => deliveryInfo.order, {
     cascade: true,
   })

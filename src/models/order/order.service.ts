@@ -20,7 +20,7 @@ export class OrderService {
     @InjectMapper() private readonly classMapper: Mapper,
   ) {}
 
-  async createOrder(order: Order): Promise<OrderByIdDto> {
+  async createOrder(order: Order): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -39,10 +39,6 @@ export class OrderService {
           );
       }
       await queryRunner.commitTransaction();
-
-      console.log(createdOrder);
-
-      return this.classMapper.map(createdOrder, Order, OrderByIdDto);
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw new UnhandledException(err);
@@ -66,14 +62,27 @@ export class OrderService {
 
   async getOrderById(id: number): Promise<OrderByIdDto> {
     try {
-      const orderById = await this.orderRepository
+      const orderById: Order = await this.orderRepository
         .createQueryBuilder("order")
         .innerJoinAndSelect("order.user", "user")
         .innerJoinAndSelect("user.userContactInfo", "userContactInfo")
         .innerJoinAndSelect("order.orderProducts", "orderProducts")
         .innerJoinAndSelect("orderProducts.product", "product")
+        .innerJoinAndSelect("order.orderDeliveryInfo", "orderDeliveryInfo")
+        .innerJoinAndSelect("orderDeliveryInfo.city", "city")
         .getOne();
-      console.log(orderById);
+      return this.classMapper.map(orderById, Order, OrderByIdDto);
+    } catch (err) {
+      throw new UnhandledException(err);
+    }
+  }
+  async getOrders(id: number): Promise<OrderByIdDto> {
+    try {
+      const orders: Order = this.orderRepository.find({
+        relations: {
+          user: true,
+        },
+      });
       return this.classMapper.map(orderById, Order, OrderByIdDto);
     } catch (err) {
       throw new UnhandledException(err);

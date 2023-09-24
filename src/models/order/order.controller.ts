@@ -48,12 +48,20 @@ export class OrderController {
     const order = this.classMapper.map(createOrderDto, OrderCreateDto, Order);
     order.user = currentUser;
 
-    res.send(await this.orderService.createOrder(order));
+    await this.orderService.createOrder(order);
+    res.sendStatus(HttpStatus.OK);
   }
 
   @Get(":id")
   @UseGuards(JwtGuard)
   async getOrderById(@Param() id: number) {
+    return await this.orderService.getOrderById(id);
+  }
+
+  @Get("")
+  @Roles([RoleName.ADMINISTRATOR, RoleName.WAREHOUSE_ADMINISTRATOR])
+  @UseGuards(JwtGuard, RoleGuard)
+  async getOrders(@Param() id: number) {
     return await this.orderService.getOrderById(id);
   }
 }
