@@ -18,7 +18,6 @@ export class RoleGuard implements CanActivate {
     ]);
 
     const jwtBody: any = this.jwtService.decode(jwt);
-
     return (
       requiredRoles.some((requiredRole) => requiredRole === jwtBody.role) &&
       jwtBody.activated

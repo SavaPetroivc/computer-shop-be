@@ -18,6 +18,7 @@ export class CreateProductTable1695488983589 implements MigrationInterface {
             type: "varchar",
             length: "128",
             isNullable: false,
+            isUnique: true,
           }),
           new TableColumn({
             name: "price",

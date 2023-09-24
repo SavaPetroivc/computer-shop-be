@@ -10,6 +10,7 @@ import { UserModule } from "./models/user/user.module";
 import { AutomapperModule } from "@automapper/nestjs";
 import { classes } from "@automapper/classes";
 import { JwtModule } from "@nestjs/jwt";
+import { ProductModule } from "./models/product/product.module";
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { JwtModule } from "@nestjs/jwt";
     }),
     RoleModule,
     UserModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],

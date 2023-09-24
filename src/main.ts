@@ -1,7 +1,8 @@
-import { NestFactory } from "@nestjs/core";
+import {HttpAdapterHost, NestFactory} from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import {BasicExceptionFilter} from "./core/filters/exceptions/basic-exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -11,8 +12,12 @@ async function bootstrap() {
     .setTitle("Demo Application")
     .setDescription("Demo API Application")
     .setVersion("v1")
-    .addTag("books")
     .build();
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+
+
+  app.useGlobalFilters(new BasicExceptionFilter(httpAdapter))
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);

@@ -1,14 +1,17 @@
-import {AutoMap} from "@automapper/classes";
-import {ApiProperty} from "@nestjs/swagger";
+import { AutoMap } from "@automapper/classes";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNumber } from "class-validator";
 
-export class ProductCreateDto{
-    @AutoMap()
-    @ApiProperty()
-    name:string;
-    @AutoMap()
-    @ApiProperty()
-    price:number
-    @AutoMap()
-    @ApiProperty()
-    quantity:number
+export class ProductCreateDto {
+  @AutoMap()
+  @ApiProperty()
+  name: string;
+  @AutoMap()
+  @ApiProperty()
+  @IsNumber()
+  price: number;
+  @AutoMap()
+  @ApiProperty()
+  @IsNumber()
+  quantity: number;
 }

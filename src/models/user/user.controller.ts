@@ -1,6 +1,6 @@
 import {
   Body,
-  Controller,
+  Controller, Get,
   HttpStatus,
   Post,
   Put,
@@ -30,7 +30,9 @@ import { RoleService } from "../role/role.service";
 import { SelfGuard } from "../../core/guards/jwt/self.guard";
 import { JwtService } from "@nestjs/jwt";
 import { UserUpdateDto } from "./dto/user-update.dto";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags("users")
 @Controller("users")
 export class UserController {
   constructor(
