@@ -9,5 +9,6 @@ import { ProductProfile } from "./profiles/product.profile";
   imports: [TypeOrmModule.forFeature([Product])],
   controllers: [ProductController],
   providers: [ProductService, ProductProfile],
+  exports: [ProductService],
 })
 export class ProductModule {}

@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Product } from "./entity/product.entity";
-import { ILike, Repository } from "typeorm";
+import { ILike, In, Repository } from "typeorm";
 import { ProductClientOverviewDto } from "./dto/product-client-overview.dto";
 import { InjectMapper } from "@automapper/nestjs";
 import { Mapper } from "@automapper/core";
-import { ProductAlreadyExistsException } from "./exceptions/product-already-exists.exception";
 import { ProductAdminOverviewDto } from "./dto/product-admin-overview.dto";
+import { ProductPrice } from "./model/product-price.model";
+import { UnhandledException } from "../../helpers/exception/unhandled.exception";
 
 @Injectable()
 export class ProductService {
@@ -65,5 +66,16 @@ export class ProductService {
 
   async deleteProduct(id: number) {
     return await this.productRepository.delete({ id });
+  }
+
+  async getProductsByIds(ids: number[]): Promise<ProductPrice[]> {
+    try {
+      return (await this.productRepository.find({
+        where: { id: In(ids) },
+        select: { price: true, id: true },
+      })) as ProductPrice[];
+    } catch (err) {
+      throw new UnhandledException(err.message);
+    }
   }
 }

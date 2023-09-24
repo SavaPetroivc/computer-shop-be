@@ -17,7 +17,7 @@ export class BasicExceptionFilter extends BaseExceptionFilter {
 
     response.status(HttpStatus.BAD_REQUEST).json({
       message,
-      statusCode: HttpStatus.BAD_REQUEST,
+      statusCode: exception.getResponse()["statusCode"],
       time: new Date().toISOString(),
     });
   }

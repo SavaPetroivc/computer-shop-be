@@ -4,10 +4,15 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import {User} from "../../user/entities/user.entity";
-import {OrderProducts} from "./order-products.entity";
+import { User } from "../../user/entities/user.entity";
+import { OrderProducts } from "./order-products.entity";
+import { OrderDeliveryInfo } from "../../order-delivery-info/entity/order-delivery-info.entity";
+import { AutoMap } from "@automapper/classes";
+import { OrderDeliveryCreateDto } from "../../order-delivery-info/dto/order-delivery-create.dto";
+import { OrderProductsCreateDto } from "../dto/order-products-create.dto";
 
 @Entity("order", { schema: "computer_shop" })
 export class Order {
@@ -20,9 +25,6 @@ export class Order {
   @Column("double", { name: "total", precision: 22 })
   total: number;
 
-  @Column("int", { name: "quantity" })
-  quantity: number;
-
   @ManyToOne(() => User, (user) => user.orders, {
     onDelete: "CASCADE",
     onUpdate: "RESTRICT",
@@ -30,6 +32,15 @@ export class Order {
   @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
   user: User;
 
-  @OneToMany(() => OrderProducts, (orderProducts) => orderProducts.order)
+  @AutoMap(() => OrderProductsCreateDto)
+  @OneToMany(() => OrderProducts, (orderProducts) => orderProducts.order, {
+    cascade: ["insert", "update"],
+  })
   orderProducts: OrderProducts[];
+
+  @AutoMap(() => OrderDeliveryCreateDto)
+  @OneToOne(() => OrderDeliveryInfo, (deliveryInfo) => deliveryInfo.order, {
+    cascade: true,
+  })
+  orderDeliveryInfo: OrderDeliveryInfo;
 }

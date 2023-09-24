@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { UserDeliveryAddress } from "../../user/entities/user-delivery-address.entity";
+import { OrderDeliveryInfo } from "../../order-delivery-info/entity/order-delivery-info.entity";
 
 @Entity("city", { schema: "computer_shop" })
 export class City {
@@ -14,4 +15,10 @@ export class City {
     (userDeliveryAddress) => userDeliveryAddress.city,
   )
   userDeliveryAddresses: UserDeliveryAddress[];
+
+  @OneToMany(
+    () => OrderDeliveryInfo,
+    (orderDeliveryInfo) => orderDeliveryInfo.city,
+  )
+  orderDeliveryInfos: OrderDeliveryInfo[];
 }

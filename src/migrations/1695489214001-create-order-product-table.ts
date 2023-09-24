@@ -13,6 +13,13 @@ export class CreateOrderProductTable1695489214001
       new Table({
         name: "order_products",
         columns: [
+          {
+            name: "id",
+            type: "int",
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: "increment",
+          },
           { name: "product_id", type: "int", isNullable: false },
           { name: "order_id", type: "int", isNullable: false },
           { name: "quantity", type: "int", isNullable: false },

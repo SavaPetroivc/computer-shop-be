@@ -7,5 +7,5 @@ export class ProductClientOverviewDto {
   name: string;
   @AutoMap()
   @ApiProperty()
-  price: string;
+  price: number;
 }

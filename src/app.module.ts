@@ -11,6 +11,7 @@ import { AutomapperModule } from "@automapper/nestjs";
 import { classes } from "@automapper/classes";
 import { JwtModule } from "@nestjs/jwt";
 import { ProductModule } from "./models/product/product.module";
+import { OrderModule } from "./models/order/order.module";
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ProductModule } from "./models/product/product.module";
     RoleModule,
     UserModule,
     ProductModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
