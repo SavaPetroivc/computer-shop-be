@@ -32,12 +32,6 @@ export class CreateUserContactInfoTable1695324735090
             type: "varchar",
             length: "128",
           }),
-
-          new TableColumn({
-            name: "user_id",
-            type: "int",
-            isNullable: false,
-          }),
         ],
       }),
     );

@@ -42,7 +42,6 @@ export class UserController {
   ) {}
 
   @Post("")
-  @UseGuards(JwtGuard)
   @UseFilters(new UserAlreadyExistsExceptionFilter())
   async registerUser(
     @Body() userCreateDto: UserCreateDto,
