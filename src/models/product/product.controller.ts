@@ -82,6 +82,8 @@ export class ProductController {
   @Roles([RoleName.ADMINISTRATOR])
   async deleteProduct(@Param() id: number, @Res() res: Response) {
     await this.productService.deleteProduct(id);
+
+
     res.sendStatus(HttpStatus.OK);
   }
 }
