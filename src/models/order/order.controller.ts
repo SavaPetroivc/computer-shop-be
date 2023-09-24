@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
+  Param,
   Post,
   Res,
   UseGuards,
@@ -47,5 +49,11 @@ export class OrderController {
     order.user = currentUser;
 
     res.send(await this.orderService.createOrder(order));
+  }
+
+  @Get(":id")
+  @UseGuards(JwtGuard)
+  async getOrderById(@Param() id: number) {
+    return await this.orderService.getOrderById(id);
   }
 }

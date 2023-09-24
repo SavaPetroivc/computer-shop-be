@@ -16,6 +16,7 @@ import { UserContactInfoCreateDto } from "../dto/user-contact-info.create.dto";
 import { BasicFkDto } from "../../../helpers/dto/basic-fk-dto";
 import * as bcrypt from "bcrypt";
 import { Order } from "../../order/entities/order.entity";
+import {UserContactInfoGetDto} from "../dto/user-contact-info-get.dto";
 @Index("UQ_78a916df40e02a9deb1c4b75edb", ["username"], { unique: true })
 @Entity("user", { schema: "computer_shop" })
 export class User {
@@ -38,13 +39,8 @@ export class User {
   @Column("varchar", { name: "last_name", length: 128 })
   lastName: string;
 
-  @OneToMany(
-    () => UserDeliveryAddress,
-    (userDeliveryAddress) => userDeliveryAddress.user,
-  )
-  userDeliveryAddresses: UserDeliveryAddress[];
-
   @AutoMap(() => UserContactInfoCreateDto)
+  @AutoMap(() => UserContactInfoGetDto)
   @ManyToOne(
     () => UserContactInfo,
     (userContactInfo) => userContactInfo.users,

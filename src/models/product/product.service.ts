@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Product } from "./entity/product.entity";
-import { ILike, In, Repository } from "typeorm";
+import { ILike, In, Repository, UpdateResult } from "typeorm";
 import { ProductClientOverviewDto } from "./dto/product-client-overview.dto";
 import { InjectMapper } from "@automapper/nestjs";
 import { Mapper } from "@automapper/core";
@@ -76,6 +76,21 @@ export class ProductService {
       })) as ProductPrice[];
     } catch (err) {
       throw new UnhandledException(err.message);
+    }
+  }
+
+  async decreaseQuantity(
+    productId: number,
+    amount: number,
+  ): Promise<UpdateResult> {
+    try {
+      return await this.productRepository.decrement(
+        { id: productId },
+        "quantity",
+        amount,
+      );
+    } catch (err) {
+      throw new UnhandledException(err);
     }
   }
 }

@@ -13,18 +13,24 @@ import { OrderDeliveryInfo } from "../../order-delivery-info/entity/order-delive
 import { AutoMap } from "@automapper/classes";
 import { OrderDeliveryCreateDto } from "../../order-delivery-info/dto/order-delivery-create.dto";
 import { OrderProductsCreateDto } from "../dto/order-products-create.dto";
+import { UserContactInfoGetDto } from "../../user/dto/user-contact-info-get.dto";
+import { UserOrderCreatedDto } from "../../user/dto/user-order-created.dto";
+import { OrderDeliveryInfoDto } from "../dto/order-delivery-info.dto";
 
 @Entity("order", { schema: "computer_shop" })
 export class Order {
   @PrimaryGeneratedColumn({ type: "int", name: "id" })
   id: number;
 
+  @AutoMap()
   @Column("date", { name: "date", default: () => "'curdate()'" })
   date: string;
 
+  @AutoMap()
   @Column("double", { name: "total", precision: 22 })
   total: number;
 
+  @AutoMap(() => UserOrderCreatedDto)
   @ManyToOne(() => User, (user) => user.orders, {
     onDelete: "CASCADE",
     onUpdate: "RESTRICT",

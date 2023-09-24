@@ -22,12 +22,6 @@ export class UserDeliveryAddress {
   @Column("varchar", { name: "number", length: 128 })
   number: string;
 
-  @ManyToOne(() => User, (user) => user.userDeliveryAddresses, {
-    onDelete: "CASCADE",
-    onUpdate: "RESTRICT",
-  })
-  @JoinColumn([{ name: "user_id", referencedColumnName: "id" }])
-  user: User;
 
   @ManyToOne(() => City, (city) => city.userDeliveryAddresses, {
     onDelete: "CASCADE",
