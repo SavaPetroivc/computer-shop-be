@@ -76,7 +76,7 @@ export class ProductController {
   }
 
   @Delete(":id")
-  @ApiParam({ name: "id", type: "number" })
+  @ApiParam({ name: "id", type: "number"  })
   @UseGuards(JwtGuard, RoleGuard)
   @ApiOkResponse({ type: "string" })
   @Roles([RoleName.ADMINISTRATOR])
