@@ -63,12 +63,12 @@ export class UserController {
   @UseFilters(UserNotFoundExceptionFilter)
   @UseFilters(PasswordNotValidExceptionFilter)
   async auth(@Body() authDto: AuthDto, @Res() res: Response) {
-    const token = await this.authService.auth(
+    const [me, token] = await this.authService.auth(
       authDto.username,
       authDto.password,
     );
     res.cookie(AUTHORIZATION_HEADER, token, { httpOnly: true });
-    res.sendStatus(HttpStatus.OK);
+    res.send(me);
   }
 
   @Post("with-role")
