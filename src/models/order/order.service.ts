@@ -10,6 +10,7 @@ import { Product } from "../product/entity/product.entity";
 import { OrderByIdDto } from "./dto/order-by-id.dto";
 import { InjectMapper } from "@automapper/nestjs";
 import { Mapper } from "@automapper/core";
+import { MostPopularProductsDto } from "./dto/most-popular-products.dto";
 
 @Injectable()
 export class OrderService {
@@ -84,6 +85,26 @@ export class OrderService {
         },
       });
       return this.classMapper.mapArray(orders, Order, OrderByIdDto);
+    } catch (err) {
+      throw new UnhandledException(err);
+    }
+  }
+
+  async getMostPopularProducts(): Promise<MostPopularProductsDto[]> {
+    try {
+      const qb = this.orderRepository.createQueryBuilder("order");
+      const response: any[] = await qb
+        .select(
+          "product.price,product.name,count(orderProducts.product.id)*orderProducts.quantity as amount",
+        )
+        .innerJoin("order.orderProducts", "orderProducts")
+        .innerJoin("orderProducts.product", "product")
+        .groupBy("orderProducts.product.id")
+        .limit(4)
+        .orderBy("amount","DESC")
+        .getRawMany();
+
+      return response.map(({ name, price }) => ({ name, price }));
     } catch (err) {
       throw new UnhandledException(err);
     }

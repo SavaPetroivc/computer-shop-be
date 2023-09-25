@@ -52,6 +52,10 @@ export class OrderController {
     res.sendStatus(HttpStatus.OK);
   }
 
+  @Get("most-popular")
+  async getMostPopularProducts(@Param() id: number) {
+    return await this.orderService.getMostPopularProducts();
+  }
   @Get(":id")
   @UseGuards(JwtGuard)
   async getOrderById(@Param() id: number) {
@@ -64,4 +68,5 @@ export class OrderController {
   async getOrders(@Param() id: number) {
     return await this.orderService.getOrderById(id);
   }
+
 }
