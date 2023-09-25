@@ -1,6 +1,7 @@
 import {
   Body,
-  Controller, Get,
+  Controller,
+  Get,
   HttpStatus,
   Post,
   Put,
@@ -31,6 +32,7 @@ import { SelfGuard } from "../../core/guards/jwt/self.guard";
 import { JwtService } from "@nestjs/jwt";
 import { UserUpdateDto } from "./dto/user-update.dto";
 import { ApiTags } from "@nestjs/swagger";
+import { MeUserInfoDto } from "./dto/me-user-info.dto";
 
 @ApiTags("users")
 @Controller("users")
@@ -53,7 +55,7 @@ export class UserController {
     user.role = await this.roleService.getRoleByName(RoleName.USER);
     user.activated = true;
 
-    await this.userService.save(user)
+    await this.userService.save(user);
     res.sendStatus(HttpStatus.OK);
   }
 
@@ -65,7 +67,7 @@ export class UserController {
       authDto.username,
       authDto.password,
     );
-    res.setHeader(AUTHORIZATION_HEADER, token);
+    res.cookie(AUTHORIZATION_HEADER, token, { httpOnly: true });
     res.sendStatus(HttpStatus.OK);
   }
 
@@ -82,6 +84,16 @@ export class UserController {
     );
     user.password = "Test123";
     return await this.userService.save(user);
+  }
+
+  @Get("me")
+  @UseGuards(JwtGuard)
+  async getUserInfo(@Res() res: Response, @Req() req: Request) {
+    const user = await this.userService.findUserByUsername(
+      this.jwtService.decode(req.cookies[AUTHORIZATION_HEADER])["username"],
+      { role: true },
+    );
+    res.send(this.classMapper.map(user, User, MeUserInfoDto));
   }
 
   @Put(":id")

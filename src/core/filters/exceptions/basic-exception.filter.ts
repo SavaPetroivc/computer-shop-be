@@ -15,7 +15,7 @@ export class BasicExceptionFilter extends BaseExceptionFilter {
     const response = context.getResponse<Response>();
     const message = exception.getResponse()["message"];
 
-    response.status(HttpStatus.BAD_REQUEST).json({
+    response.status(exception.getResponse()["statusCode"]).json({
       message,
       statusCode: exception.getResponse()["statusCode"],
       time: new Date().toISOString(),

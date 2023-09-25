@@ -7,11 +7,12 @@ import {
   Param,
   Post,
   Put,
+  Req,
   Res,
   UseGuards,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { ApiOkResponse, ApiParam, ApiTags } from "@nestjs/swagger";
 import { ProductClientOverviewDto } from "./dto/product-client-overview.dto";
 import { JwtGuard } from "../../core/guards/jwt/jwt.guard";
@@ -76,7 +77,7 @@ export class ProductController {
   }
 
   @Delete(":id")
-  @ApiParam({ name: "id", type: "number"  })
+  @ApiParam({ name: "id", type: "number" })
   @UseGuards(JwtGuard, RoleGuard)
   @ApiOkResponse({ type: "string" })
   @Roles([RoleName.ADMINISTRATOR])

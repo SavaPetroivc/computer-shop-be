@@ -2,6 +2,7 @@ import { AutomapperProfile, InjectMapper } from "@automapper/nestjs";
 import {
   createMap,
   forMember,
+  mapFrom,
   Mapper,
   MappingProfile,
   mapWith,
@@ -14,6 +15,7 @@ import { UserOrderCreatedDto } from "../dto/user-order-created.dto";
 import { UserContactInfoGetDto } from "../dto/user-contact-info-get.dto";
 import { UserContactInfo } from "../entities/user-contact-info.entity";
 import { UserContactInfoCreateDto } from "../dto/user-contact-info.create.dto";
+import { MeUserInfoDto } from "../dto/me-user-info.dto";
 
 export class UserAutomapperProfile extends AutomapperProfile {
   constructor(@InjectMapper() mapper: Mapper) {
@@ -38,6 +40,15 @@ export class UserAutomapperProfile extends AutomapperProfile {
       createMap(mapper, UserUpdateDto, User);
       createMap(mapper, UserContactInfo, UserContactInfoGetDto);
       createMap(mapper, UserContactInfoCreateDto, UserContactInfo);
+      createMap(
+        mapper,
+        User,
+        MeUserInfoDto,
+        forMember(
+          (destination) => destination.role,
+          mapFrom((source) => source.role.role),
+        ),
+      );
       createMap(
         mapper,
         User,
