@@ -40,7 +40,6 @@ export class OrderService {
       }
       await queryRunner.commitTransaction();
     } catch (err) {
-      console.log(err);
       await queryRunner.rollbackTransaction();
       throw new UnhandledException(err);
     } finally {
