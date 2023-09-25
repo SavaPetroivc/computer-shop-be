@@ -13,6 +13,7 @@ import { UserUpdateDto } from "../dto/user-update.dto";
 import { UserOrderCreatedDto } from "../dto/user-order-created.dto";
 import { UserContactInfoGetDto } from "../dto/user-contact-info-get.dto";
 import { UserContactInfo } from "../entities/user-contact-info.entity";
+import { UserContactInfoCreateDto } from "../dto/user-contact-info.create.dto";
 
 export class UserAutomapperProfile extends AutomapperProfile {
   constructor(@InjectMapper() mapper: Mapper) {
@@ -20,10 +21,23 @@ export class UserAutomapperProfile extends AutomapperProfile {
   }
   get profile(): MappingProfile {
     return (mapper) => {
-      createMap(mapper, UserCreateDto, User);
+      createMap(
+        mapper,
+        UserCreateDto,
+        User,
+        forMember(
+          (destination) => destination.userContactInfo,
+          mapWith(
+            UserContactInfo,
+            UserContactInfoCreateDto,
+            (source) => source.userContactInfo,
+          ),
+        ),
+      );
       createMap(mapper, UserAsEmployeeCreateDto, User);
       createMap(mapper, UserUpdateDto, User);
       createMap(mapper, UserContactInfo, UserContactInfoGetDto);
+      createMap(mapper, UserContactInfoCreateDto, UserContactInfo);
       createMap(
         mapper,
         User,

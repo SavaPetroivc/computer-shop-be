@@ -40,6 +40,7 @@ export class OrderService {
       }
       await queryRunner.commitTransaction();
     } catch (err) {
+      console.log(err);
       await queryRunner.rollbackTransaction();
       throw new UnhandledException(err);
     } finally {
@@ -76,14 +77,14 @@ export class OrderService {
       throw new UnhandledException(err);
     }
   }
-  async getOrders(id: number): Promise<OrderByIdDto> {
+  async getOrders(id: number): Promise<OrderByIdDto[]> {
     try {
-      const orders: Order = this.orderRepository.find({
+      const orders: Order[] = await this.orderRepository.find({
         relations: {
           user: true,
         },
       });
-      return this.classMapper.map(orderById, Order, OrderByIdDto);
+      return this.classMapper.mapArray(orders, Order, OrderByIdDto);
     } catch (err) {
       throw new UnhandledException(err);
     }

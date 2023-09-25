@@ -17,7 +17,7 @@ async function bootstrap() {
   const { httpAdapter } = app.get(HttpAdapterHost);
 
 
-  app.useGlobalFilters(new BasicExceptionFilter(httpAdapter))
+  app.useGlobalFilters(new BasicExceptionFilter(httpAdapter));
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);

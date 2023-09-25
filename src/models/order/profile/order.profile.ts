@@ -18,6 +18,9 @@ import { UserOrderCreatedDto } from "../../user/dto/user-order-created.dto";
 import { User } from "../../user/entities/user.entity";
 import { OrderProducts } from "../entities/order-products.entity";
 import { OrderProductsInOrderDto } from "../dto/order-products-in-order.dto";
+import { OrderProductsCreateDto } from "../dto/order-products-create.dto";
+import { BasicFkDto } from "../../../helpers/dto/basic-fk-dto";
+import { City } from "../../city/entity/city.entity";
 
 export class OrderProfile extends AutomapperProfile {
   constructor(@InjectMapper() mapper: Mapper) {
@@ -26,7 +29,30 @@ export class OrderProfile extends AutomapperProfile {
 
   get profile(): MappingProfile {
     return (mapper) => {
-      createMap(mapper, OrderCreateDto, Order);
+      createMap(
+        mapper,
+        OrderCreateDto,
+        Order,
+        forMember(
+          (destination) => destination.orderProducts,
+          mapWith(
+            OrderProducts,
+            OrderProductsCreateDto,
+            (source) => source.orderProducts,
+          ),
+        ),
+        forMember(
+          (destination) => destination.orderDeliveryInfo,
+          mapWith(
+            OrderDeliveryInfo,
+            OrderDeliveryCreateDto,
+            (source) => source.orderDeliveryInfo,
+          ),
+        ),
+      );
+      createMap(mapper, OrderProductsCreateDto, OrderProducts);
+      createMap(mapper, OrderDeliveryCreateDto, OrderDeliveryInfo);
+      createMap(mapper, BasicFkDto, City);
       createMap(
         mapper,
         Order,

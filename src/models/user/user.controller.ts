@@ -52,8 +52,8 @@ export class UserController {
     const user = this.classMapper.map(userCreateDto, UserCreateDto, User);
     user.role = await this.roleService.getRoleByName(RoleName.USER);
     user.activated = true;
-    await this.userService.save(user);
 
+    await this.userService.save(user)
     res.sendStatus(HttpStatus.OK);
   }
 
