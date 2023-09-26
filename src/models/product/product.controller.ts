@@ -45,6 +45,7 @@ export class ProductController {
   }
 
   @Post("")
+  @ApiOkResponse({ type: [Product] })
   @UseGuards(JwtGuard, RoleGuard)
   @Roles([RoleName.ADMINISTRATOR, RoleName.WAREHOUSE_ADMINISTRATOR])
   createProduct(@Body() createProductDto: ProductCreateDto) {
