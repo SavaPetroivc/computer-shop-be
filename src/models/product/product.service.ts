@@ -60,7 +60,6 @@ export class ProductService {
         ProductAdminOverviewDto,
       );
     } catch (err) {
-      console.log(err);
       throw new UnhandledException(err);
     }
   }

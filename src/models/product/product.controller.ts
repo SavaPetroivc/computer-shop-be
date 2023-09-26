@@ -82,7 +82,7 @@ export class ProductController {
   @UseGuards(JwtGuard, RoleGuard)
   @ApiOkResponse({ type: "string" })
   @Roles([RoleName.ADMINISTRATOR])
-  async deleteProduct(@Param() id: number, @Res() res: Response) {
+  async deleteProduct(@Param("id") id: number, @Res() res: Response) {
     await this.productService.deleteProduct(id);
     res.sendStatus(HttpStatus.OK);
   }
