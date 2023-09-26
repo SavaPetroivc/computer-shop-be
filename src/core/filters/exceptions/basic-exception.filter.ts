@@ -13,6 +13,7 @@ export class BasicExceptionFilter extends BaseExceptionFilter {
   catch(exception: BadRequestException, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
+    console.log(exception);
     const message = exception.getResponse()["message"];
 
     response.status(exception.getResponse()["statusCode"]).json({
