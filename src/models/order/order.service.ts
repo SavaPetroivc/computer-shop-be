@@ -95,16 +95,16 @@ export class OrderService {
       const qb = this.orderRepository.createQueryBuilder("order");
       const response: any[] = await qb
         .select(
-          "product.price,product.name,count(orderProducts.product.id)*orderProducts.quantity as amount",
+          "product.id,product.price,product.name,count(orderProducts.product.id)*orderProducts.quantity as amount",
         )
         .innerJoin("order.orderProducts", "orderProducts")
         .innerJoin("orderProducts.product", "product")
         .groupBy("orderProducts.product.id")
         .limit(4)
-        .orderBy("amount","DESC")
+        .orderBy("amount", "DESC")
         .getRawMany();
 
-      return response.map(({ name, price }) => ({ name, price }));
+      return response.map(({ name, price, id }) => ({ name, price, id }));
     } catch (err) {
       throw new UnhandledException(err);
     }
