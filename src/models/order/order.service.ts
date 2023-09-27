@@ -61,7 +61,7 @@ export class OrderService {
       }, 0);
   }
 
-  async getOrderById(id: number): Promise<OrderByIdDto[]> {
+  async getOrders(): Promise<OrderByIdDto[]> {
     try {
       const orderById: Order[] = await this.orderRepository.find({
         relations: {
@@ -71,18 +71,6 @@ export class OrderService {
         },
       });
       return this.classMapper.mapArray(orderById, Order, OrderByIdDto);
-    } catch (err) {
-      throw new UnhandledException(err);
-    }
-  }
-  async getOrders(id: number): Promise<OrderByIdDto[]> {
-    try {
-      const orders: Order[] = await this.orderRepository.find({
-        relations: {
-          user: true,
-        },
-      });
-      return this.classMapper.mapArray(orders, Order, OrderByIdDto);
     } catch (err) {
       throw new UnhandledException(err);
     }
@@ -103,6 +91,21 @@ export class OrderService {
         .getRawMany();
 
       return response.map(({ name, price, id }) => ({ name, price, id }));
+    } catch (err) {
+      throw new UnhandledException(err);
+    }
+  }
+  async getOrdersByUser(userId: number): Promise<OrderByIdDto[]> {
+    try {
+      const orderById: Order[] = await this.orderRepository.find({
+        relations: {
+          user: { userContactInfo: true },
+          orderProducts: { product: true },
+          orderDeliveryInfo: { city: true },
+        },
+        where:{user:{id:userId}}
+      });
+      return this.classMapper.mapArray(orderById, Order, OrderByIdDto);
     } catch (err) {
       throw new UnhandledException(err);
     }

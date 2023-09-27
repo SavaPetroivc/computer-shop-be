@@ -23,6 +23,7 @@ import { Order } from "./entities/order.entity";
 import { Response } from "express";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { OrderByIdDto } from "./dto/order-by-id.dto";
+import { SelfGuard } from "../../core/guards/jwt/self.guard";
 
 @ApiTags("orders")
 @Controller("orders")
@@ -57,17 +58,24 @@ export class OrderController {
   async getMostPopularProducts(@Param() id: number) {
     return await this.orderService.getMostPopularProducts();
   }
-  @Get(":id")
-  @UseGuards(JwtGuard)
-  async getOrderById(@Param() id: number) {
-    return await this.orderService.getOrderById(id);
-  }
 
   @Get("")
-  @ApiOkResponse({  type: [OrderByIdDto] })
+  @ApiOkResponse({ type: [OrderByIdDto] })
   @Roles([RoleName.ADMINISTRATOR, RoleName.WAREHOUSE_ADMINISTRATOR])
   @UseGuards(JwtGuard, RoleGuard)
-  async getOrders(@Param() id: number) {
-    return await this.orderService.getOrderById(id);
+  async getOrders() {
+    return await this.orderService.getOrders();
+  }
+
+  @Get("me")
+  @ApiOkResponse({ type: [OrderByIdDto] })
+  @UseGuards(JwtGuard)
+  async getOrdersMe(@Authorization() jwt: string) {
+    const jwtBody = this.jwtService.decode(jwt);
+
+    const currentUser = await this.userService.findUserByUsername(
+      jwtBody["username"],
+    );
+    return await this.orderService.getOrdersByUser(currentUser.id);
   }
 }
