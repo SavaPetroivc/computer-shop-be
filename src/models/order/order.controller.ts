@@ -45,7 +45,7 @@ export class OrderController {
     const currentUser = await this.userService.findUserByUsername(
       jwtBody.username,
     );
-    const order = this.classMapper.map(createOrderDto, OrderCreateDto, Order);
+    const order = this.classMapper.map(createOrderDto, OrderCreateDto, Order,);
     order.user = currentUser;
 
     await this.orderService.createOrder(order);

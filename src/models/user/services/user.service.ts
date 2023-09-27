@@ -7,6 +7,7 @@ import { RoleName } from "../../role/enums/role-name.enum";
 import { UserAlreadyExistsException } from "../exceptions/user-already-exists.exception";
 import { FindOptionsRelations } from "typeorm/find-options/FindOptionsRelations";
 import { use } from "passport";
+import { UnhandledException } from "../../../helpers/exception/unhandled.exception";
 
 @Injectable()
 export class UserService {
@@ -27,7 +28,7 @@ export class UserService {
     try {
       return this.userRepository.findOne({ where: { username }, relations });
     } catch (err) {
-      throw Error(err);
+      throw new UnhandledException(err);
     }
   }
   async findUserById(id: number): Promise<User> {
@@ -48,6 +49,4 @@ export class UserService {
       throw Error(err);
     }
   }
-
-
 }

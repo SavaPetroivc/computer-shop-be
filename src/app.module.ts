@@ -12,6 +12,7 @@ import { classes } from "@automapper/classes";
 import { JwtModule } from "@nestjs/jwt";
 import { ProductModule } from "./models/product/product.module";
 import { OrderModule } from "./models/order/order.module";
+import { CityModule } from "./models/city/city.module";
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { OrderModule } from "./models/order/order.module";
     UserModule,
     ProductModule,
     OrderModule,
+    CityModule
   ],
   controllers: [AppController],
   providers: [AppService],
