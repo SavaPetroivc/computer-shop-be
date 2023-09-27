@@ -21,7 +21,8 @@ import { InjectMapper } from "@automapper/nestjs";
 import { Mapper } from "@automapper/core";
 import { Order } from "./entities/order.entity";
 import { Response } from "express";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { OrderByIdDto } from "./dto/order-by-id.dto";
 
 @ApiTags("orders")
 @Controller("orders")
@@ -45,7 +46,7 @@ export class OrderController {
     const currentUser = await this.userService.findUserByUsername(
       jwtBody.username,
     );
-    const order = this.classMapper.map(createOrderDto, OrderCreateDto, Order,);
+    const order = this.classMapper.map(createOrderDto, OrderCreateDto, Order);
     order.user = currentUser;
 
     await this.orderService.createOrder(order);
@@ -63,10 +64,10 @@ export class OrderController {
   }
 
   @Get("")
+  @ApiOkResponse({  type: [OrderByIdDto] })
   @Roles([RoleName.ADMINISTRATOR, RoleName.WAREHOUSE_ADMINISTRATOR])
   @UseGuards(JwtGuard, RoleGuard)
   async getOrders(@Param() id: number) {
     return await this.orderService.getOrderById(id);
   }
-
 }

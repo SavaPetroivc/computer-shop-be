@@ -61,18 +61,16 @@ export class OrderService {
       }, 0);
   }
 
-  async getOrderById(id: number): Promise<OrderByIdDto> {
+  async getOrderById(id: number): Promise<OrderByIdDto[]> {
     try {
-      const orderById: Order = await this.orderRepository
-        .createQueryBuilder("order")
-        .innerJoinAndSelect("order.user", "user")
-        .innerJoinAndSelect("user.userContactInfo", "userContactInfo")
-        .innerJoinAndSelect("order.orderProducts", "orderProducts")
-        .innerJoinAndSelect("orderProducts.product", "product")
-        .innerJoinAndSelect("order.orderDeliveryInfo", "orderDeliveryInfo")
-        .innerJoinAndSelect("orderDeliveryInfo.city", "city")
-        .getOne();
-      return this.classMapper.map(orderById, Order, OrderByIdDto);
+      const orderById: Order[] = await this.orderRepository.find({
+        relations: {
+          user: { userContactInfo: true },
+          orderProducts: { product: true },
+          orderDeliveryInfo: { city: true },
+        },
+      });
+      return this.classMapper.mapArray(orderById, Order, OrderByIdDto);
     } catch (err) {
       throw new UnhandledException(err);
     }
