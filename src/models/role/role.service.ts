@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Role } from "./entity/role.entity";
 import { RoleName } from "./enums/role-name.enum";
+import { UnhandledException } from "../../helpers/exception/unhandled.exception";
 
 @Injectable()
 export class RoleService {
@@ -14,7 +15,11 @@ export class RoleService {
     try {
       return await this.roleRepository.findOne({ where: { role } });
     } catch (err) {
-      throw new Error(err);
+      throw new UnhandledException(err);
     }
+  }
+
+  async getRoles(): Promise<Role[]> {
+    return await this.roleRepository.find();
   }
 }

@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { ApiOkResponse, ApiParam, ApiTags } from "@nestjs/swagger";
 import { ProductClientOverviewDto } from "./dto/product-client-overview.dto";
 import { JwtGuard } from "../../core/guards/jwt/jwt.guard";

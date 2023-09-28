@@ -8,7 +8,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { UserDeliveryAddress } from "./user-delivery-address.entity";
 import { UserContactInfo } from "./user-contact-info.entity";
 import { Role } from "../../role/entity/role.entity";
 import { AutoMap } from "@automapper/classes";
@@ -16,7 +15,8 @@ import { UserContactInfoCreateDto } from "../dto/user-contact-info.create.dto";
 import { BasicFkDto } from "../../../helpers/dto/basic-fk-dto";
 import * as bcrypt from "bcrypt";
 import { Order } from "../../order/entities/order.entity";
-import {UserContactInfoGetDto} from "../dto/user-contact-info-get.dto";
+import { UserContactInfoGetDto } from "../dto/user-contact-info-get.dto";
+import { RoleInUserOverviewDto } from "../../role/dto/role-in-user-overview.dto";
 @Index("UQ_78a916df40e02a9deb1c4b75edb", ["username"], { unique: true })
 @Entity("user", { schema: "computer_shop" })
 export class User {
@@ -50,6 +50,7 @@ export class User {
   userContactInfo: UserContactInfo;
 
   @AutoMap(() => BasicFkDto)
+  @AutoMap(() => RoleInUserOverviewDto)
   @ManyToOne(() => Role, (role) => role.users, {
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
@@ -68,4 +69,6 @@ export class User {
   private hashPassword() {
     this.password = bcrypt.hashSync(this.password, 10);
   }
+
+
 }

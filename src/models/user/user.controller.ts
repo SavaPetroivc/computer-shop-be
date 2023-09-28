@@ -31,8 +31,9 @@ import { RoleService } from "../role/role.service";
 import { SelfGuard } from "../../core/guards/jwt/self.guard";
 import { JwtService } from "@nestjs/jwt";
 import { UserUpdateDto } from "./dto/user-update.dto";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { MeUserInfoDto } from "./dto/me-user-info.dto";
+import { UserOverviewDto } from "./dto/user-overview.dto";
 
 @ApiTags("users")
 @Controller("users")
@@ -94,6 +95,24 @@ export class UserController {
       { role: true },
     );
     res.send(this.classMapper.map(user, User, MeUserInfoDto));
+  }
+
+  @Put("password/me")
+  @UseGuards(JwtGuard)
+  async updatePassword(@Res() res: Response, @Req() req: Request) {
+    const username = this.jwtService.decode(req.cookies[AUTHORIZATION_HEADER])[
+      "username"
+    ];
+    await this.userService.setNewPassword(username, req.body.password);
+    res.sendStatus(HttpStatus.OK);
+  }
+
+  @Get()
+  @ApiOkResponse({ type: [UserOverviewDto] })
+  @UseGuards(JwtGuard, RoleGuard)
+  @Roles([RoleName.ADMINISTRATOR])
+  async getUsers(@Res() res: Response, @Req() req: Request) {
+    res.send(await this.userService.getUsers());
   }
 
   @Put(":id")

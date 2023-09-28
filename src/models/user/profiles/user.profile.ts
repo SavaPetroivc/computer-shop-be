@@ -16,6 +16,10 @@ import { UserContactInfoGetDto } from "../dto/user-contact-info-get.dto";
 import { UserContactInfo } from "../entities/user-contact-info.entity";
 import { UserContactInfoCreateDto } from "../dto/user-contact-info.create.dto";
 import { MeUserInfoDto } from "../dto/me-user-info.dto";
+import { UserOverviewDto } from "../dto/user-overview.dto";
+import { Role } from "../../role/entity/role.entity";
+import { RoleInUserOverviewDto } from "../../role/dto/role-in-user-overview.dto";
+import { BasicFkDto } from "../../../helpers/dto/basic-fk-dto";
 
 export class UserAutomapperProfile extends AutomapperProfile {
   constructor(@InjectMapper() mapper: Mapper) {
@@ -36,7 +40,23 @@ export class UserAutomapperProfile extends AutomapperProfile {
           ),
         ),
       );
-      createMap(mapper, UserAsEmployeeCreateDto, User);
+      createMap(
+        mapper,
+        UserAsEmployeeCreateDto,
+        User,
+        forMember(
+          (destination) => destination.userContactInfo,
+          mapWith(
+            UserContactInfo,
+            UserContactInfoCreateDto,
+            (source) => source.userContactInfo,
+          ),
+        ),
+        forMember(
+          (destination) => destination.role,
+          mapWith(Role, BasicFkDto, (source) => source.role),
+        ),
+      );
       createMap(mapper, UserUpdateDto, User);
       createMap(mapper, UserContactInfo, UserContactInfoGetDto);
       createMap(mapper, UserContactInfoCreateDto, UserContactInfo);
@@ -47,6 +67,15 @@ export class UserAutomapperProfile extends AutomapperProfile {
         forMember(
           (destination) => destination.role,
           mapFrom((source) => source.role.role),
+        ),
+      );
+      createMap(
+        mapper,
+        User,
+        UserOverviewDto,
+        forMember(
+          (destination) => destination.role,
+          mapWith(RoleInUserOverviewDto, Role, (source) => source.role),
         ),
       );
       createMap(

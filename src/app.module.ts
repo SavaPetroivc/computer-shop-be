@@ -58,7 +58,7 @@ import { CityModule } from "./models/city/city.module";
     UserModule,
     ProductModule,
     OrderModule,
-    CityModule
+    CityModule,
   ],
   controllers: [AppController],
   providers: [AppService],
