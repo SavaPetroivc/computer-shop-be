@@ -1,0 +1,1 @@
+docker pull mariadb && docker run -p 127.0.0.1:3306:3306  --name mdb -e MARIADB_ROOT_PASSWORD=password123 -d mariadb:latest && sleep 10 && docker exec -it mdb mariadb --user root -ppassword123 -e "CREATE DATABASE computer_shop" && npm run migration:run &&  docker exec -i mdb sh -c 'exec mariadb -uroot -ppassword123' < ../src/sql/roles.sql
