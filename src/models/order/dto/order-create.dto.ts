@@ -1,0 +1,20 @@
+import { BasicFkDto } from "../../../helpers/dto/basic-fk-dto";
+import { AutoMap } from "@automapper/classes";
+import { OrderDeliveryCreateDto } from "../../order-delivery-info/dto/order-delivery-create.dto";
+import { OrderProductsCreateDto } from "./order-products-create.dto";
+import { IsNotEmpty } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+
+export class OrderCreateDto {
+  @ApiProperty({ isArray: true, type: OrderProductsCreateDto })
+  @AutoMap(() => [OrderProductsCreateDto])
+  @Type(() => OrderProductsCreateDto)
+  @IsNotEmpty()
+  orderProducts: OrderProductsCreateDto[];
+  @ApiProperty()
+  @AutoMap(() => OrderDeliveryCreateDto)
+  @Type(() => OrderDeliveryCreateDto)
+  @IsNotEmpty()
+  orderDeliveryInfo: OrderDeliveryCreateDto;
+}
