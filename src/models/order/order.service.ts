@@ -1,9 +1,13 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
+import {
+  BadRequestException,
+  HttpException,
+  Inject,
+  Injectable,
+} from "@nestjs/common";
+import { DataSource, In, Repository } from "typeorm";
 import { Order } from "./entities/order.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OrderProducts } from "./entities/order-products.entity";
-import { ProductService } from "../product/product.service";
 import { UnhandledException } from "../../helpers/exception/unhandled.exception";
 import { Product } from "../product/entity/product.entity";
 import { OrderByIdDto } from "./dto/order-by-id.dto";
@@ -17,22 +21,29 @@ export class OrderService {
   constructor(
     @InjectRepository(Order) private orderRepository: Repository<Order>,
     @Inject(DataSource) private dataSource: DataSource,
-    private productService: ProductService,
     @InjectMapper() private readonly classMapper: Mapper,
   ) {}
 
   async createOrder(order: Order): Promise<void> {
-    const products = await this.productService.getProductsByIds(
-      order.orderProducts.map((oP) => oP.product.id),
-    );
-    this.assertStockAvailable(order.orderProducts, products);
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      order.total = this.sumOrderTotal(order.orderProducts, products);
+      // Zakljucavanje redova (SELECT ... FOR UPDATE) drzi konkurentne porudzbine
+      // istih proizvoda na cekanju dok se ova ne zavrsi - bez toga bi dve
+      // paralelne porudzbine mogle da prodju istu proveru i oborе lager u minus.
+      // Zakljucavanje se oslobadja tek na commit/rollback.
+      const products = await queryRunner.manager.getRepository(Product).find({
+        where: { id: In(order.orderProducts.map((oP) => oP.product.id)) },
+        lock: { mode: "pessimistic_write" },
+      });
+
+      this.assertStockAvailable(order.orderProducts, products);
+      this.applyPriceSnapshot(order.orderProducts, products);
+
+      order.total = this.sumOrderTotal(order.orderProducts);
       order.status = OrderStatus.IN_PREPARATION;
+
       const createdOrder = await queryRunner.manager
         .getRepository(Order)
         .save(order);
@@ -48,9 +59,21 @@ export class OrderService {
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();
-      throw new UnhandledException(err);
+      throw err instanceof HttpException ? err : new UnhandledException(err);
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  /** Upisuje trenutnu cenu proizvoda u stavku, da kasnija izmena cene ne menja istoriju. */
+  private applyPriceSnapshot(
+    orderProducts: OrderProducts[],
+    products: Product[],
+  ): void {
+    for (const orderProduct of orderProducts) {
+      orderProduct.price = products.find(
+        (p) => p.id === orderProduct.product.id,
+      ).price;
     }
   }
 
@@ -59,9 +82,7 @@ export class OrderService {
     products: Product[],
   ): void {
     for (const orderProduct of orderProducts) {
-      const product = products.find(
-        (p) => Number(p.id) === Number(orderProduct.product.id),
-      );
+      const product = products.find((p) => p.id === orderProduct.product.id);
 
       if (!product) {
         throw new BadRequestException(
@@ -79,13 +100,12 @@ export class OrderService {
     }
   }
 
-  sumOrderTotal(orderProducts: OrderProducts[], products: Product[]): number {
-    return orderProducts.reduce((sum, orderProduct) => {
-      const product = products.find(
-        (p) => Number(p.id) === Number(orderProduct.product.id),
-      );
-      return sum + orderProduct.quantity * (product?.price ?? 0);
-    }, 0);
+  /** Racuna se iz snapshot-a cene na stavci, ne iz trenutne cene proizvoda. */
+  sumOrderTotal(orderProducts: OrderProducts[]): number {
+    return orderProducts.reduce(
+      (sum, orderProduct) => sum + orderProduct.quantity * orderProduct.price,
+      0,
+    );
   }
 
   async getOrders(): Promise<OrderByIdDto[]> {
@@ -144,7 +164,7 @@ export class OrderService {
           orderProducts: { product: true },
           orderDeliveryInfo: { city: true },
         },
-        where:{user:{id:userId}}
+        where: { user: { id: userId } },
       });
       return this.classMapper.mapArray(orderById, Order, OrderByIdDto);
     } catch (err) {

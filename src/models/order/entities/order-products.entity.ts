@@ -21,6 +21,11 @@ export class OrderProducts {
   @Column({ type: "int", name: "quantity" })
   quantity: number;
 
+  /** Cena proizvoda u trenutku kupovine - ne menja se kad se cena proizvoda promeni. */
+  @AutoMap()
+  @Column("double", { name: "price", precision: 22 })
+  price: number;
+
   @AutoMap(() => BasicFkDto)
   @ManyToOne(() => Product, (product) => product.orderProducts, {
     onDelete: "RESTRICT",

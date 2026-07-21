@@ -1,7 +1,14 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { Request } from "express";
 import { UserService } from "../../../models/user/services/user.service";
-import { AUTHORIZATION_HEADER } from "../../headers/headers";
+import { extractToken } from "./extract-token";
 
 @Injectable()
 export class SelfGuard implements CanActivate {
@@ -9,16 +16,32 @@ export class SelfGuard implements CanActivate {
     private jwtService: JwtService,
     private userService: UserService,
   ) {}
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const jwt = context.switchToHttp().getRequest().cookies[AUTHORIZATION_HEADER];
-    const jwtBody: any = this.jwtService.decode(jwt);
+    const request = context.switchToHttp().getRequest<Request>();
+    const token = extractToken(request);
 
-    const url: string = context.switchToHttp().getRequest().url;
-    const userForUpdateId = Number.parseInt(
-      url.substring(url.lastIndexOf("/") + 1, url.length),
-    );
-    const user = await this.userService.findUserByUsername(jwtBody.username);
+    if (!token) {
+      throw new UnauthorizedException();
+    }
 
-    return user.id === userForUpdateId;
+    let payload: { username?: string };
+    try {
+      payload = this.jwtService.verify(token);
+    } catch {
+      throw new UnauthorizedException();
+    }
+
+    const targetUserId = Number(request.params.id);
+    if (!Number.isInteger(targetUserId)) {
+      throw new ForbiddenException();
+    }
+
+    const user = await this.userService.findUserByUsername(payload.username);
+    if (!user || user.id !== targetUserId) {
+      throw new ForbiddenException();
+    }
+
+    return true;
   }
 }

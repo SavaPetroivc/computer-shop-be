@@ -16,7 +16,7 @@ import { OrderProductsCreateDto } from "../dto/order-products-create.dto";
 import { UserContactInfoGetDto } from "../../user/dto/user-contact-info-get.dto";
 import { UserOrderCreatedDto } from "../../user/dto/user-order-created.dto";
 import { OrderDeliveryInfoDto } from "../dto/order-delivery-info.dto";
-import {OrderProductsInOrderDto} from "../dto/order-products-in-order.dto";
+import { OrderProductsInOrderDto } from "../dto/order-products-in-order.dto";
 import { OrderStatus } from "../enums/order-status.enum";
 
 @Entity("order", { schema: "computer_shop" })
@@ -26,8 +26,8 @@ export class Order {
   id: number;
 
   @AutoMap()
-  @Column("date", { name: "date", default: () => "'curdate()'" })
-  date: string;
+  @Column("datetime", { name: "date", default: () => "CURRENT_TIMESTAMP" })
+  date: Date;
 
   @AutoMap()
   @Column("double", { name: "total", precision: 22 })

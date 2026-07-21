@@ -1,8 +1,14 @@
-import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
-import { Observable } from "rxjs";
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
-import { AUTHORIZATION_HEADER } from "../../headers/headers";
+import { Request } from "express";
+import { extractToken } from "./extract-token";
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -10,20 +16,35 @@ export class RoleGuard implements CanActivate {
     private reflector: Reflector,
     private jwtService: JwtService,
   ) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const jwt = context.switchToHttp().getRequest().cookies[
-      AUTHORIZATION_HEADER
-    ];
+
+  canActivate(context: ExecutionContext): boolean {
     const requiredRoles: string[] = this.reflector.getAllAndOverride("roles", [
       context.getHandler(),
+      context.getClass(),
     ]);
 
-    const jwtBody: any = this.jwtService.decode(jwt);
-    return (
-      requiredRoles.some((requiredRole) => requiredRole === jwtBody.role) &&
-      jwtBody.activated
-    );
+    if (!requiredRoles?.length) {
+      return true;
+    }
+
+    const request = context.switchToHttp().getRequest<Request>();
+    const token = extractToken(request);
+
+    if (!token) {
+      throw new UnauthorizedException();
+    }
+
+    let payload: { role?: string; activated?: boolean };
+    try {
+      payload = this.jwtService.verify(token);
+    } catch {
+      throw new UnauthorizedException();
+    }
+
+    if (!payload.activated || !requiredRoles.includes(payload.role)) {
+      throw new ForbiddenException();
+    }
+
+    return true;
   }
 }

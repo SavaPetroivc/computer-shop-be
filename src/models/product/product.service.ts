@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Product } from "./entity/product.entity";
 import { ILike, In, Repository, UpdateResult } from "typeorm";
@@ -38,6 +38,17 @@ export class ProductService {
 
   async createProduct(product: Product): Promise<Product> {
     return this.productRepository.save(product);
+  }
+
+  async updateProduct(product: Product): Promise<Product> {
+    const id = Number(product.id);
+    const existing = await this.productRepository.findOneBy({ id });
+
+    if (!existing) {
+      throw new NotFoundException(`Product with id ${id} does not exist.`);
+    }
+
+    return this.productRepository.save({ ...product, id });
   }
 
   async findProductByName(name: string): Promise<Product> {

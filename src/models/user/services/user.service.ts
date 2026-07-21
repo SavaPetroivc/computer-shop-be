@@ -7,7 +7,6 @@ import { RoleService } from "../../role/role.service";
 import { RoleName } from "../../role/enums/role-name.enum";
 import { UserAlreadyExistsException } from "../exceptions/user-already-exists.exception";
 import { FindOptionsRelations } from "typeorm/find-options/FindOptionsRelations";
-import { use } from "passport";
 import { UnhandledException } from "../../../helpers/exception/unhandled.exception";
 import { UserOverviewDto } from "../dto/user-overview.dto";
 import { InjectMapper } from "@automapper/nestjs";
@@ -41,7 +40,7 @@ export class UserService {
     try {
       return await this.userRepository.findOneBy({ id });
     } catch (err) {
-      throw new Error(err);
+      throw new UnhandledException(err);
     }
   }
 
@@ -58,12 +57,12 @@ export class UserService {
 
   async updateUser(user: User, currentUser: User) {
     try {
-      user.userContactInfo.id = currentUser.id;
       user.id = currentUser.id;
+      user.userContactInfo.id = currentUser.userContactInfo.id;
 
       await this.userRepository.save(user);
     } catch (err) {
-      throw Error(err);
+      throw new UnhandledException(err);
     }
   }
   async updateProfile(

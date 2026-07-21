@@ -22,6 +22,7 @@ export const databaseProvider: Provider = {
       password,
       username,
       type: "mariadb",
+      timezone: "Z",
       migrationsRun: true,
       entities: ["dist/models/**/*.entity.js"],
       migrations: ["dist/migrations/**.js"],

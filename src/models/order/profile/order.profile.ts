@@ -59,7 +59,7 @@ export class OrderProfile extends AutomapperProfile {
           (destination) => destination.city,
           mapFrom((source) =>
             source.city?.id
-              ? ({ id: Number(source.city.id) } as City)
+              ? ({ id: source.city.id } as City)
               : (null as unknown as City),
           ),
         ),
@@ -114,7 +114,7 @@ export class OrderProfile extends AutomapperProfile {
         ),
         forMember(
           (destination) => destination.price,
-          mapFrom((source) => source.product.price),
+          mapFrom((source) => source.price),
         ),
       );
     };

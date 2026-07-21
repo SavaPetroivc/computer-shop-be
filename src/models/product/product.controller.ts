@@ -66,7 +66,7 @@ export class ProductController {
       ProductUpdateDto,
       Product,
     );
-    return this.productService.createProduct(product);
+    return this.productService.updateProduct(product);
   }
 
   @Get("administrators")

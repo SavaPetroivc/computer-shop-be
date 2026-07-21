@@ -35,6 +35,7 @@ import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { MeUserInfoDto } from "./dto/me-user-info.dto";
 import { UserOverviewDto } from "./dto/user-overview.dto";
+import { Authorization } from "../../helpers/decorators/authorization.decorator";
 
 @ApiTags("users")
 @Controller("users")
@@ -138,20 +139,23 @@ export class UserController {
 
   @Put(":id")
   @UseGuards(JwtGuard, SelfGuard)
-  async updateUser(@Req() req: Request, @Res() res: Response) {
-    try {
-      const jwt = req.header("authorization");
-      const decodedJwt: any = this.jwtService.decode(jwt);
-      const currentUser = await this.userService.findUserByUsername(
-        decodedJwt.username,
-      );
+  async updateUser(
+    @Body() userUpdateDto: UserUpdateDto,
+    @Authorization() jwt: string,
+    @Res() res: Response,
+  ) {
+    const username = this.jwtService.decode(jwt)["username"];
+    const currentUser = await this.userService.findUserByUsername(username, {
+      userContactInfo: true,
+    });
 
-      const userForUpdate = this.classMapper.map(req.body, UserUpdateDto, User);
+    const userForUpdate = this.classMapper.map(
+      userUpdateDto,
+      UserUpdateDto,
+      User,
+    );
 
-      await this.userService.updateUser(userForUpdate, currentUser);
-      res.sendStatus(HttpStatus.OK);
-    } catch ({ message }) {
-      res.status(HttpStatus.BAD_REQUEST).send({ message });
-    }
+    await this.userService.updateUser(userForUpdate, currentUser);
+    res.sendStatus(HttpStatus.OK);
   }
 }

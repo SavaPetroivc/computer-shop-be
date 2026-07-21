@@ -1,8 +1,12 @@
 import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { IsInt } from "class-validator";
 
 export class BasicFkDto {
   @AutoMap()
   @ApiProperty()
-  id: string;
+  @Type(() => Number)
+  @IsInt()
+  id: number;
 }

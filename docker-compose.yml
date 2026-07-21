@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: mdb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: password123
+      MARIADB_DATABASE: computer_shop
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Izvrsava se samo pri prvom podizanju (prazan volumen) - kreira semu i podatke.
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:

@@ -24,13 +24,41 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Backend (REST API) za online prodavnicu racunara. NestJS + TypeORM + MariaDB.
+Swagger dokumentacija je dostupna na `http://localhost:3000/api`.
 
 ## Installation
 
 ```bash
 $ npm install
 ```
+
+### Podesavanje okruzenja
+
+Konfiguracija se cita iz `src/environments/.env`. Napravi ga iz sablona i popuni vrednosti:
+
+```bash
+$ cp src/environments/.env.example src/environments/.env
+```
+
+| Promenljiva | Znacenje |
+|---|---|
+| `PORT` | port aplikacije |
+| `DATABASE_HOST` / `DATABASE_PORT` | adresa baze |
+| `DATABASE_NAME` | ime seme (`computer_shop`) |
+| `DATABASE_USER` / `DATABASE_PASSWORD` | kredencijali baze |
+| `JWT_SECRET` | tajni kljuc za potpisivanje JWT tokena |
+
+### Baza podataka
+
+Skripta podize MariaDB u Docker-u, kreira semu i pokrece migracije:
+
+```bash
+$ cd database && sh database.sh
+```
+
+Migracije ukljucuju i seed podatke - tri uloge i pocetni administratorski nalog
+(korisnicko ime `admin`).
 
 ## Running the app
 

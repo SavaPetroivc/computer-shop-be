@@ -38,6 +38,9 @@ import { CityModule } from "./models/city/city.module";
           password,
           username,
           type: "mariadb",
+          // Baza (Docker kontejner) radi u UTC - bez ovoga drajver bi DATETIME
+          // vrednosti tumacio kao lokalno vreme i pomerao ih za offset zone.
+          timezone: "Z",
           migrationsRun: true,
           entities: ["dist/models/**/*.entity.js"],
           migrations: ["dist/migrations/**.ts"],

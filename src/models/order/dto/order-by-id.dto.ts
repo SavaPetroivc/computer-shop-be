@@ -11,7 +11,7 @@ export class OrderByIdDto {
   id: number;
   @ApiProperty()
   @AutoMap()
-  date: number;
+  date: Date;
   @AutoMap()
   @ApiProperty()
   total: number;
@@ -19,12 +19,12 @@ export class OrderByIdDto {
   @ApiProperty({ enum: OrderStatus })
   status: OrderStatus;
   @AutoMap(() => [OrderProductsInOrderDto])
-  @ApiProperty({type:[OrderProductsInOrderDto]})
+  @ApiProperty({ type: [OrderProductsInOrderDto] })
   orderProducts: OrderProductsInOrderDto[];
-  @ApiProperty({type:UserOrderCreatedDto})
+  @ApiProperty({ type: UserOrderCreatedDto })
   @AutoMap(() => UserOrderCreatedDto)
   user: UserOrderCreatedDto;
-  @ApiProperty({type:OrderDeliveryInfoDto})
+  @ApiProperty({ type: OrderDeliveryInfoDto })
   @AutoMap(() => OrderDeliveryInfoDto)
   orderDeliveryInfo: OrderDeliveryInfoDto;
 }
