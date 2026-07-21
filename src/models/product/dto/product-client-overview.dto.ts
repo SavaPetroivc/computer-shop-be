@@ -12,6 +12,9 @@ export class ProductClientOverviewDto {
   @ApiProperty()
   price: number;
   @AutoMap()
+  @ApiProperty()
+  quantity: number;
+  @AutoMap()
   @ApiProperty({ required: false })
   imageUrl: string;
 }

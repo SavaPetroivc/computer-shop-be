@@ -1,10 +1,9 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
 import { Order } from "./entities/order.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OrderProducts } from "./entities/order-products.entity";
 import { ProductService } from "../product/product.service";
-import { ProductPrice } from "../product/model/product-price.model";
 import { UnhandledException } from "../../helpers/exception/unhandled.exception";
 import { Product } from "../product/entity/product.entity";
 import { OrderByIdDto } from "./dto/order-by-id.dto";
@@ -23,11 +22,16 @@ export class OrderService {
   ) {}
 
   async createOrder(order: Order): Promise<void> {
+    const products = await this.productService.getProductsByIds(
+      order.orderProducts.map((oP) => oP.product.id),
+    );
+    this.assertStockAvailable(order.orderProducts, products);
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      order.total = await this.sumOrderTotal(order.orderProducts);
+      order.total = this.sumOrderTotal(order.orderProducts, products);
       order.status = OrderStatus.IN_PREPARATION;
       const createdOrder = await queryRunner.manager
         .getRepository(Order)
@@ -50,17 +54,38 @@ export class OrderService {
     }
   }
 
-  async sumOrderTotal(orderProducts: OrderProducts[]): Promise<number> {
-    const products: ProductPrice[] = await this.productService.getProductsByIds(
-      orderProducts.map((oP) => oP.product.id),
-    );
+  private assertStockAvailable(
+    orderProducts: OrderProducts[],
+    products: Product[],
+  ): void {
+    for (const orderProduct of orderProducts) {
+      const product = products.find(
+        (p) => Number(p.id) === Number(orderProduct.product.id),
+      );
 
-    return orderProducts
-      .map((oP, index) => ({ ...oP, ...products[index] }))
-      .reduce((sum, currentValue) => {
-        sum += currentValue.quantity * currentValue.price;
-        return sum;
-      }, 0);
+      if (!product) {
+        throw new BadRequestException(
+          "One of the ordered products no longer exists.",
+        );
+      }
+      if (product.quantity < 1) {
+        throw new BadRequestException(`"${product.name}" is out of stock.`);
+      }
+      if (product.quantity < orderProduct.quantity) {
+        throw new BadRequestException(
+          `Not enough stock for "${product.name}" - only ${product.quantity} left.`,
+        );
+      }
+    }
+  }
+
+  sumOrderTotal(orderProducts: OrderProducts[], products: Product[]): number {
+    return orderProducts.reduce((sum, orderProduct) => {
+      const product = products.find(
+        (p) => Number(p.id) === Number(orderProduct.product.id),
+      );
+      return sum + orderProduct.quantity * (product?.price ?? 0);
+    }, 0);
   }
 
   async getOrders(): Promise<OrderByIdDto[]> {
@@ -83,7 +108,7 @@ export class OrderService {
       const qb = this.orderRepository.createQueryBuilder("order");
       const response: any[] = await qb
         .select(
-          "product.id,product.price,product.name,count(orderProducts.product.id)*orderProducts.quantity as amount",
+          "product.id,product.price,product.name,product.image_url,product.quantity,count(orderProducts.product.id)*orderProducts.quantity as amount",
         )
         .innerJoin("order.orderProducts", "orderProducts")
         .innerJoin("orderProducts.product", "product")
@@ -92,7 +117,13 @@ export class OrderService {
         .orderBy("amount", "DESC")
         .getRawMany();
 
-      return response.map(({ name, price, id }) => ({ name, price, id }));
+      return response.map(({ name, price, id, image_url, quantity }) => ({
+        name,
+        price,
+        id,
+        quantity,
+        imageUrl: image_url,
+      }));
     } catch (err) {
       throw new UnhandledException(err);
     }

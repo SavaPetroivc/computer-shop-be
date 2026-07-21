@@ -51,7 +51,19 @@ export class OrderProfile extends AutomapperProfile {
         ),
       );
       createMap(mapper, OrderProductsCreateDto, OrderProducts);
-      createMap(mapper, OrderDeliveryCreateDto, OrderDeliveryInfo);
+      createMap(
+        mapper,
+        OrderDeliveryCreateDto,
+        OrderDeliveryInfo,
+        forMember(
+          (destination) => destination.city,
+          mapFrom((source) =>
+            source.city?.id
+              ? ({ id: Number(source.city.id) } as City)
+              : (null as unknown as City),
+          ),
+        ),
+      );
       createMap(mapper, BasicFkDto, City);
       createMap(
         mapper,

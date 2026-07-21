@@ -6,7 +6,6 @@ import { ProductClientOverviewDto } from "./dto/product-client-overview.dto";
 import { InjectMapper } from "@automapper/nestjs";
 import { Mapper } from "@automapper/core";
 import { ProductAdminOverviewDto } from "./dto/product-admin-overview.dto";
-import { ProductPrice } from "./model/product-price.model";
 import { UnhandledException } from "../../helpers/exception/unhandled.exception";
 
 @Injectable()
@@ -68,12 +67,12 @@ export class ProductService {
     return await this.productRepository.delete({ id });
   }
 
-  async getProductsByIds(ids: number[]): Promise<ProductPrice[]> {
+  async getProductsByIds(ids: number[]): Promise<Product[]> {
     try {
-      return (await this.productRepository.find({
+      return await this.productRepository.find({
         where: { id: In(ids) },
-        select: { price: true, id: true },
-      })) as ProductPrice[];
+        select: { id: true, name: true, price: true, quantity: true },
+      });
     } catch (err) {
       throw new UnhandledException(err);
     }
