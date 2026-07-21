@@ -20,6 +20,10 @@ export class Product {
   @Column("double", { name: "quantity", precision: 22 })
   quantity: number;
 
+  @AutoMap()
+  @Column("varchar", { name: "image_url", length: 1024, nullable: true })
+  imageUrl: string;
+
   @OneToMany(() => OrderProducts, (orderProducts) => orderProducts.product)
   orderProducts: OrderProducts[];
 }

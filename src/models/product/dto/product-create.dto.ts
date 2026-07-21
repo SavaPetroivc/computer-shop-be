@@ -1,6 +1,6 @@
 import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber } from "class-validator";
+import { IsNumber, IsOptional } from "class-validator";
 
 export class ProductCreateDto {
   @AutoMap()
@@ -14,4 +14,8 @@ export class ProductCreateDto {
   @ApiProperty()
   @IsNumber()
   quantity: number;
+  @AutoMap()
+  @ApiProperty({ required: false })
+  @IsOptional()
+  imageUrl: string;
 }

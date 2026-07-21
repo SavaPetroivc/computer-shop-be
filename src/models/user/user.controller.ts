@@ -99,7 +99,7 @@ export class UserController {
   async getUserInfo(@Res() res: Response, @Req() req: Request) {
     const user = await this.userService.findUserByUsername(
       this.jwtService.decode(req.cookies[AUTHORIZATION_HEADER])["username"],
-      { role: true, userContactInfo: true },
+      { role: true, userContactInfo: { city: true } },
     );
     res.send(this.classMapper.map(user, User, MeUserInfoDto));
   }

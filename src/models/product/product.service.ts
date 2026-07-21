@@ -20,7 +20,7 @@ export class ProductService {
     try {
       return await this.productRepository.find();
     } catch (err) {
-      throw new Error(err);
+      throw new UnhandledException(err);
     }
   }
 
@@ -33,7 +33,7 @@ export class ProductService {
         ProductClientOverviewDto,
       );
     } catch (err) {
-      throw new Error(err);
+      throw new UnhandledException(err);
     }
   }
 
@@ -75,7 +75,7 @@ export class ProductService {
         select: { price: true, id: true },
       })) as ProductPrice[];
     } catch (err) {
-      throw new UnhandledException(err.message);
+      throw new UnhandledException(err);
     }
   }
 

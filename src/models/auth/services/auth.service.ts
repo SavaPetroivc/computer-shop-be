@@ -24,6 +24,7 @@ export class AuthService {
   ): Promise<[MeUserInfoDto, string]> {
     const potentialUser = await this.userService.findUserByUsername(username, {
       role: true,
+      userContactInfo: { city: true },
     });
     if (!potentialUser) {
       throw new UserNotFoundException();

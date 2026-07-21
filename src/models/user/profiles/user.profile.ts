@@ -20,6 +20,8 @@ import { UserOverviewDto } from "../dto/user-overview.dto";
 import { Role } from "../../role/entity/role.entity";
 import { RoleInUserOverviewDto } from "../../role/dto/role-in-user-overview.dto";
 import { BasicFkDto } from "../../../helpers/dto/basic-fk-dto";
+import { City } from "../../city/entity/city.entity";
+import { CityDto } from "../../city/dto/city.dto";
 
 export class UserAutomapperProfile extends AutomapperProfile {
   constructor(@InjectMapper() mapper: Mapper) {
@@ -58,8 +60,32 @@ export class UserAutomapperProfile extends AutomapperProfile {
         ),
       );
       createMap(mapper, UserUpdateDto, User);
-      createMap(mapper, UserContactInfo, UserContactInfoGetDto);
-      createMap(mapper, UserContactInfoCreateDto, UserContactInfo);
+      createMap(
+        mapper,
+        UserContactInfo,
+        UserContactInfoGetDto,
+        forMember(
+          (destination) => destination.city,
+          mapFrom((source) =>
+            source.city
+              ? ({ id: source.city.id, name: source.city.name } as CityDto)
+              : (null as unknown as CityDto),
+          ),
+        ),
+      );
+      createMap(
+        mapper,
+        UserContactInfoCreateDto,
+        UserContactInfo,
+        forMember(
+          (destination) => destination.city,
+          mapFrom((source) =>
+            source.city?.id
+              ? ({ id: source.city.id } as unknown as City)
+              : (null as unknown as City),
+          ),
+        ),
+      );
       createMap(
         mapper,
         User,

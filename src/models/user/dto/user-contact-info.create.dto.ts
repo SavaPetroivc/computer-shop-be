@@ -1,6 +1,8 @@
 import { AutoMap } from "@automapper/classes";
-import { IsPhoneNumber, Matches } from "class-validator";
+import { IsOptional, IsPhoneNumber, Matches, ValidateNested } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
+import { BasicFkDto } from "../../../helpers/dto/basic-fk-dto";
 
 export class UserContactInfoCreateDto {
   @AutoMap()
@@ -13,4 +15,22 @@ export class UserContactInfoCreateDto {
   @ApiProperty()
   @IsPhoneNumber()
   contactPhone: string;
+  @AutoMap()
+  @ApiProperty({ required: false })
+  @IsOptional()
+  street: string;
+  @AutoMap()
+  @ApiProperty({ required: false })
+  @IsOptional()
+  number: string;
+  @AutoMap()
+  @ApiProperty({ required: false })
+  @IsOptional()
+  zip: string;
+  @AutoMap(() => BasicFkDto)
+  @ApiProperty({ type: BasicFkDto, required: false })
+  @IsOptional()
+  @Type(() => BasicFkDto)
+  @ValidateNested()
+  city: BasicFkDto;
 }

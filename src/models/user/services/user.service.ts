@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../entities/user.entity";
+import { City } from "../../city/entity/city.entity";
 import { Repository } from "typeorm";
 import { RoleService } from "../../role/role.service";
 import { RoleName } from "../../role/enums/role-name.enum";
@@ -47,7 +48,7 @@ export class UserService {
   async getUsers(): Promise<UserOverviewDto[]> {
     try {
       const users = await this.userRepository.find({
-        relations: { role: true, userContactInfo: true },
+        relations: { role: true, userContactInfo: { city: true } },
       });
       return this.classMapper.mapArray(users, User, UserOverviewDto);
     } catch (er) {
@@ -70,7 +71,14 @@ export class UserService {
     data: {
       firstName: string;
       lastName: string;
-      userContactInfo: { email: string; contactPhone: string };
+      userContactInfo: {
+        email: string;
+        contactPhone: string;
+        street?: string;
+        number?: string;
+        zip?: string;
+        city?: { id: string | number } | null;
+      };
     },
   ): Promise<void> {
     const user = await this.userRepository.findOne({
@@ -81,6 +89,12 @@ export class UserService {
     user.lastName = data.lastName;
     user.userContactInfo.email = data.userContactInfo.email;
     user.userContactInfo.contactPhone = data.userContactInfo.contactPhone;
+    user.userContactInfo.street = data.userContactInfo.street;
+    user.userContactInfo.number = data.userContactInfo.number;
+    user.userContactInfo.zip = data.userContactInfo.zip;
+    user.userContactInfo.city = data.userContactInfo.city?.id
+      ? ({ id: data.userContactInfo.city.id } as City)
+      : (null as unknown as City);
     await this.userRepository.save(user);
   }
 

@@ -11,4 +11,7 @@ export class ProductClientOverviewDto {
   @AutoMap()
   @ApiProperty()
   price: number;
+  @AutoMap()
+  @ApiProperty({ required: false })
+  imageUrl: string;
 }
